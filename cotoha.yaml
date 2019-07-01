@@ -49,6 +49,10 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParseResult'
   /api/dev/nlp/v1/ne:
     post:
       security:
@@ -134,6 +138,18 @@ components:
           format: "string"
           default: "default"
           example: "kuzure"
+    ParseResult:
+      type: "object"
+      properties:
+        result: 
+          type: array
+          items:
+            type: object
+        status:
+          type: integer
+        message:
+          type: string
+          description: bearer
     Ne:
       type: "object"
       required:
