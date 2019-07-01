@@ -1,0 +1,172 @@
+openapi: "3.0.0"
+
+info:
+  version: "1.0.0"
+  title: COTOHA API
+  
+servers: 
+  - url: "https://api.ce-cotoha.com"
+
+paths:
+  /v1/oauth/accesstokens:
+    post:
+      description: "issue access token"
+      requestBody:
+        description: "specify your clientID and clientSecret"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Auth'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResult'
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResult'
+           
+  /api/dev/nlp/v1/parse:
+    post:
+      security:
+        - bearerAuth: []
+      summary:
+        ""
+      description: 
+        ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Parse'
+      responses:
+        '200':
+          description: OK
+  /api/dev/nlp/v1/ne:
+    post:
+      security:
+        - bearerAuth: []
+      summary:
+        ""
+      description: 
+        ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ne'
+      responses:
+        '200':
+          description: OK
+  /api/dev/nlp/v1/coreference:
+    post:
+      security:
+        - bearerAuth: []
+      summary:
+        ""
+      description: 
+        ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Coreference'
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    Auth:
+      type: "object"
+      required:
+        - "clientId"
+        - "clientSecret"
+      properties:
+        clientId:
+          type: "string"
+          format: "string"
+          example: "your client id"
+        clientSecret:
+          type: "string"
+          format: "string"
+          example: "your client secret"
+        grantType:
+          type: "string"
+          default: "client_credentials"
+          example: "client_credentials"
+    AuthResult:
+      type: "object"
+      properties:
+        access_token: 
+          type: string
+          description: access token
+        token_type:
+          type: string
+          description: bearer
+        expieres_in:
+          type: integer
+
+          description: 残り有効期限(秒)
+        scope: 
+          type: string
+        issued_at:
+          type: string
+    Parse:
+      type: "object"
+      required:
+        - "sentence"
+      properties:
+        sentence:
+          type: "string"
+          format: "string"
+          example: "昨日太郎は公園に行った"
+        kuzure:
+          type: "string"
+          format: "string"
+          default: "default"
+          example: "kuzure"
+    Ne:
+      type: "object"
+      required:
+        - "sentence"
+      properties:
+        sentence:
+          type: "string"
+          format: "string"
+          example: "昨日太郎は公園に行った"
+        kuzure:
+          type: "string"
+          format: "string"
+          default: "default"
+          example: "kuzure"
+    Coreference:
+      type: "object"
+      required:
+        - "document"
+      properties:
+        document:
+          type: "string"
+          format: "string"
+          example: "昨日太郎は公園に行った"
+        kuzure:
+          type: "string"
+          format: "string"
+          example: "default"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security: 
+  - bearerAuth: []
+  
