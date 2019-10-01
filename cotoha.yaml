@@ -1,18 +1,15 @@
-openapi: "3.0.0"
-
+openapi: 3.0.0
 info:
-  version: "1.0.0"
+  version: 1.0.0
   title: COTOHA API
-  
-servers: 
-  - url: "https://api.ce-cotoha.com"
-
+servers:
+  - url: 'https://api.ce-cotoha.com'
 paths:
   /v1/oauth/accesstokens:
     post:
-      description: "issue access token"
+      description: issue access token
       requestBody:
-        description: "specify your clientID and clientSecret"
+        description: specify your clientID and clientSecret
         required: true
         content:
           application/json:
@@ -31,15 +28,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResult'
-           
   /api/dev/nlp/v1/parse:
     post:
       security:
         - bearerAuth: []
-      summary:
-        ""
-      description: 
-        ""
+      summary: ''
+      description: ''
       requestBody:
         required: true
         content:
@@ -57,10 +51,8 @@ paths:
     post:
       security:
         - bearerAuth: []
-      summary:
-        ""
-      description: 
-        ""
+      summary: ''
+      description: ''
       requestBody:
         required: true
         content:
@@ -70,14 +62,16 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NeResult'
   /api/dev/nlp/v1/coreference:
     post:
       security:
         - bearerAuth: []
-      summary:
-        ""
-      description: 
-        ""
+      summary: ''
+      description: ''
       requestBody:
         required: true
         content:
@@ -87,30 +81,34 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreferenceResult'
 components:
   schemas:
     Auth:
-      type: "object"
+      type: object
       required:
-        - "clientId"
-        - "clientSecret"
+        - clientId
+        - clientSecret
       properties:
         clientId:
-          type: "string"
-          format: "string"
-          example: "your client id"
+          type: string
+          format: string
+          example: your client id
         clientSecret:
-          type: "string"
-          format: "string"
-          example: "your client secret"
+          type: string
+          format: string
+          example: your client secret
         grantType:
-          type: "string"
-          default: "client_credentials"
-          example: "client_credentials"
+          type: string
+          default: client_credentials
+          example: client_credentials
     AuthResult:
-      type: "object"
+      type: object
       properties:
-        access_token: 
+        access_token:
           type: string
           description: access token
         token_type:
@@ -118,71 +116,219 @@ components:
           description: bearer
         expieres_in:
           type: integer
-
           description: 残り有効期限(秒)
-        scope: 
+        scope:
           type: string
         issued_at:
           type: string
     Parse:
-      type: "object"
+      type: object
       required:
-        - "sentence"
+        - sentence
       properties:
         sentence:
-          type: "string"
-          format: "string"
-          example: "昨日太郎は公園に行った"
+          type: string
+          format: string
+          example: 昨日太郎は公園に行った
         kuzure:
-          type: "string"
-          format: "string"
-          default: "default"
-          example: "kuzure"
+          type: string
+          format: string
+          default: default
+          example: kuzure
     ParseResult:
-      type: "object"
+      type: object
       properties:
-        result: 
+        result:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/ParseInfo'
         status:
           type: integer
         message:
           type: string
-          description: bearer
     Ne:
-      type: "object"
+      type: object
       required:
-        - "sentence"
+        - sentence
       properties:
         sentence:
-          type: "string"
-          format: "string"
-          example: "昨日太郎は公園に行った"
-        kuzure:
-          type: "string"
-          format: "string"
-          default: "default"
-          example: "kuzure"
+          type: string
+          format: string
+          example: 昨日は東京駅を利用した。
+        type:
+          type: string
+          format: string
+          default: default
+          example: kuzure
+        dic_type:
+          type: array
+          items:
+            type: string
+    NeResult:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/NeInfo'
+        status:
+          type: integer
+        message:
+          type: string
+
     Coreference:
-      type: "object"
+      type: object
       required:
-        - "document"
+        - document
       properties:
         document:
-          type: "string"
-          format: "string"
-          example: "昨日太郎は公園に行った"
+          oneOf:
+            - type: string
+              format: string
+              example: 昨日太郎は公園に行った。彼はそこで野球をした。
+            - type: array
+              items:
+                type: string
+                example: ["昨日太郎は公園に行った。", "彼はそこで野球をした。"]
         kuzure:
-          type: "string"
-          format: "string"
-          example: "default"
+          type: string
+          format: string
+          example: default
+        do_segment:
+          type: boolean
+    CoreferenceResult:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoreferenceInfo'
+        status:
+          type: integer
+        message:
+          type: string
 
+    ParseInfo:
+      type: object
+      properties:
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenInfo'
+        chunk_info:
+          $ref: '#/components/schemas/ChunkInfo'
+    TokenInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        form:
+          type: string
+        kana:
+          type: string
+        lemma:
+          type: string
+        pos:
+          type: string
+        feature:
+          type: array
+          items:
+            type: string
+        dependency_labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepInfo'
+        attributes:
+          type: object
+    ChunkInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        head:
+          type: integer
+        dep:
+          type: string
+        chunk_head:
+          type: integer
+        chunk_funkc:
+          type: integer
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkInfo'
+        predicate:
+          type: array
+          items:
+            type: string
+  
+    LinkInfo:
+      type: object
+      properties:
+        link:
+          type: integer
+        label:
+          type: string
+  
+    DepInfo:
+      type: object
+      properties:
+        token_id:
+          type: integer
+        label:
+          type: string
+    NeInfo:
+      type: object
+      properties:
+        begin_pos:
+          type: integer
+        end_pos:
+          type: integer
+        form:
+          type: string
+        std_form:
+          type: string
+        class:
+          type: string
+        extended_class:
+          type: string
+        info:
+          type: string
+        source:
+          type: string
+    CoreferenceInfo:
+      type: object
+      properties:
+        coreferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/CorefObj'
+        tokens:
+          type: array
+          items:
+            type: string
+    CorefObj:
+      type: object
+      properties:
+        representative_id:
+          type: integer
+        referents:
+          $ref: '#/components/schemas/Referents'
+    Referents:
+      type: object
+      properties:
+        referent_id:
+          type: integer
+        sentence_id:
+          type: integer
+        token_id_from:
+          type: integer
+        token_id_to:
+          type: integer
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-security: 
+security:
   - bearerAuth: []
-  
