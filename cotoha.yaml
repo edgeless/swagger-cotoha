@@ -130,7 +130,7 @@ components:
           type: string
           format: string
           example: 昨日太郎は公園に行った
-        kuzure:
+        type:
           type: string
           format: string
           default: default
